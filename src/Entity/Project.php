@@ -4,19 +4,23 @@ namespace App\Entity;
 
 use App\Repository\ProjectRepository;
 use App\Entity\SonataMediaMedia;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-class Project implements Stringable
+class Project implements Translatable
 {
+    #[Gedmo\Locale]
+    private $locale;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Gedmo\Translatable]
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
     private $title;
@@ -30,13 +34,9 @@ class Project implements Stringable
     #[ORM\JoinColumn(name: "picture", referencedColumnName: "id")]
     private $picture;
 
+    #[Gedmo\Translatable]
     #[ORM\Column(type: 'text')]
     private $content;
-
-    public function __toString(): string
-    {
-        return $this->title;
-    }
 
     public function getId(): ?int
     {
@@ -91,4 +91,13 @@ class Project implements Stringable
         return $this;
     }
 
+    public function setTranslatableLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function __toString()
+    {
+        return ($this->getTitle()) ? : '';
+    }
 }

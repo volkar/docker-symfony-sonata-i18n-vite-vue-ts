@@ -645,7 +645,7 @@ a.cke_button_off:hover, a.cke_button_off:focus, a.cke_button_off:active, a.cke_b
 }
 
 .cke_button_icon {
-    background-image: url('/bundles/fosckeditor/skins/nightshade/icons_hidpi.png?c=2') !important;
+    background-image: url('/static/ckeditor_nightshade_theme/icons_hidpi.png') !important;
 }
 
 .cke_menubutton_on {
@@ -957,4 +957,17 @@ legend.cke_voice_label {
 .cke_dialog_container a.cke_dialog_ui_button {
     box-shadow: none;
     border: none;
+}
+
+.cke_contents iframe {
+    box-sizing: border-box;
+    border: 1px solid var(--scheme-color-border);
+    border-radius: 4px;
+    transition: 300ms ease border;
+}
+.cke_contents iframe:hover {
+    border: 1px solid var(--scheme-color-faded);
+}
+.cke_contents iframe:focus {
+    border: 1px solid var(--scheme-color-text);
 }

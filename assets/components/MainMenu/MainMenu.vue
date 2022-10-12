@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import MainMenuItem from "@/components/MainMenu/MainMenuItem.vue"
-
-const mainMenuLinksArray = [
-    {title: 'Index', to: {name: 'index'}},
-    {title: 'Categories', to: {name: 'categories'}},
-    {title: 'About', to: {name: 'about'}},
-]
 </script>
 
 <template>
     <ul class="mainmenu">
-        <MainMenuItem v-for="menuItem in mainMenuLinksArray" :menu-to="menuItem.to" :menu-title="menuItem.title"></MainMenuItem>
-        <li><a href="/admin">Admin</a></li>
+        <MainMenuItem :menu-to="{name: 'index', params: {locale: $i18n.locale}}" :menu-title="$t('mainmenu.index')"></MainMenuItem>
+        <MainMenuItem :menu-to="{name: 'categories', params: {locale: $i18n.locale}}" :menu-title="$t('mainmenu.categories')"></MainMenuItem>
+        <MainMenuItem :menu-to="{name: 'about', params: {locale: $i18n.locale}}" :menu-title="$t('mainmenu.about')"></MainMenuItem>
+        <li><a href="/admin">{{ $t("mainmenu.admin") }}</a></li>
     </ul>
 </template>
 

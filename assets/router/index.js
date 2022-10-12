@@ -1,30 +1,35 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import IndexView from '@/views/IndexView.vue'
 import CategoriesView from '@/views/CategoriesView.vue'
-import CategoryDetailsView from '@/views/CategoryDetailsView.vue'
+import CategoryView from '@/views/CategoryView.vue'
 import AboutView from '@/views/AboutView.vue'
+import { getInitialLocale } from "@/utils/locale";
 
 const routes = [
     {
+        path: '/',
+        redirect: `/${getInitialLocale()}`,
+    },
+    {
         name: 'index',
         component: IndexView,
-        path: '/'
+        path: '/:locale'
     },
     {
         name: 'categories',
         component: CategoriesView,
-        path: '/categories'
+        path: '/:locale/categories'
     },
     {
         name: 'categoryDetails',
-        component: CategoryDetailsView,
-        path: '/category/:slug'
+        component: CategoryView,
+        path: '/:locale/category/:slug'
     },
     {
         name: 'about',
         component: AboutView,
-        path: '/about'
+        path: '/:locale/about'
     },
 ]
 

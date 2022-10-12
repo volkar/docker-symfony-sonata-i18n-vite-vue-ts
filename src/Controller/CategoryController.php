@@ -20,9 +20,12 @@ class CategoryController extends AbstractController
         $this->mediaPool = $mediaPool;
     }
 
-    #[Route('/api/getCategory/{slug}', name: 'getCategory', methods: ['GET'])]
-    public function getCategory($slug): Response
+    #[Route('/api/{locale}/getCategory/{slug}', name: 'getCategory', methods: ['GET'])]
+    public function getCategory($locale, $slug): Response
     {
+        // Get default locale from services.yaml
+        $defaultLocale = $this->getParameter('locale');
+
         // Get category repository
         $categoryRepository = $this->entityManagerInterface->getRepository(Category::class);
         // Get current category from repository
@@ -31,38 +34,75 @@ class CategoryController extends AbstractController
         // Return project's data
         if ($category) {
 
+            if ($locale === $defaultLocale) {
+                // Default locale
+
+                // Get projects of current category
+                $docProjects = $category->getProjects();
+                $projects = [];
+                foreach($docProjects as $dp) {
+                    $currentProject = [];
+                    $currentProject['id'] = $dp->getId();
+                    $picture = $dp->getPicture();
+                    $provider = $this->mediaPool->getProvider($picture->getProviderName());
+                    $publicUrl = $provider->generatePublicUrl($picture, 'default_small');
+                    $currentProject['picture'] = $publicUrl;
+                    $currentProject['title'] = $dp->getTitle();
+                    $currentProject['content'] = $dp->getContent();
+                    $projects[] = $currentProject;
+                }
+                return $this->json([
+                    'id' => $category->getID(),
+                    'slug' => $category->getSlug(),
+                    'title' => $category->getTitle(),
+                    'projects' => $projects,
+                    'projects_count' => count($docProjects),
+                ]);
+            }
+            // Translated content
+            $translationRepository = $this->entityManagerInterface->getRepository('Gedmo\Translatable\Entity\Translation');
+
             // Get projects of current category
             $docProjects = $category->getProjects();
             $projects = [];
             foreach($docProjects as $dp) {
                 $currentProject = [];
                 $currentProject['id'] = $dp->getId();
-                $currentProject['title'] = $dp->getTitle();
-
                 $picture = $dp->getPicture();
                 $provider = $this->mediaPool->getProvider($picture->getProviderName());
                 $publicUrl = $provider->generatePublicUrl($picture, 'default_small');
-                $currentProject['picture'] = $publicUrl;
 
-                $currentProject['content'] = $dp->getContent();
+                $projectTranslations = $translationRepository->findTranslations($dp);
+                $translatedProjectTitle = !empty($projectTranslations[$locale]['title']) ? $projectTranslations[$locale]['title'] : $dp->getTitle();
+                $translatedProjectContent = !empty($projectTranslations[$locale]['content']) ? $projectTranslations[$locale]['content'] : $dp->getContent();
+
+                $currentProject['picture'] = $publicUrl;
+                $currentProject['title'] = $translatedProjectTitle;
+                $currentProject['content'] = $translatedProjectContent;
                 $projects[] = $currentProject;
             }
 
+            $translations = $translationRepository->findTranslations($category);
+            $translatedTitle = !empty($translations[$locale]['title']) ? $translations[$locale]['title'] : $category->getTitle();
+
             return $this->json([
                 'id' => $category->getID(),
-                'title' => $category->getTitle(),
                 'slug' => $category->getSlug(),
+                'title' => $translatedTitle,
                 'projects' => $projects,
                 'projects_count' => count($docProjects),
             ]);
-        } else {
-            return $this->json([]);
         }
+
+        return $this->json([]);
     }
 
-    #[Route('/api/getCategories', name: 'getCategories', methods: ['GET'])]
-    public function getCategories(): Response
+    #[Route('/api/{locale}/getCategories', name: 'getCategories', methods: ['GET'])]
+    public function getCategories($locale): Response
     {
+        // Get default locale from services.yaml
+        $defaultLocale = $this->getParameter('locale');
+
         // Get category repository
         $categoryRepository = $this->entityManagerInterface->getRepository(Category::class);
         // Get all categories from repository
@@ -70,13 +110,32 @@ class CategoryController extends AbstractController
 
         $finalArrayOfCategories = [];
 
-        foreach ($categories as $category) {
-            $finalArrayOfCategories[] = [
-                'id' => $category->getID(),
-                'title' => $category->getTitle(),
-                'slug' => $category->getSlug(),
-                'projects_count' => count($category->getProjects()),
-            ];
+        if ($locale === $defaultLocale) {
+            // Default locale
+            foreach ($categories as $category) {
+                $finalArrayOfCategories[] = [
+                    'id' => $category->getID(),
+                    'slug' => $category->getSlug(),
+                    'title' => $category->getTitle(),
+                    'projects_count' => count($category->getProjects()),
+                ];
+            }
+        } else {
+            // Translated content
+            $translationRepository = $this->entityManagerInterface->getRepository('Gedmo\Translatable\Entity\Translation');
+
+            foreach ($categories as $category) {
+
+                $translations = $translationRepository->findTranslations($category);
+                $translatedTitle = !empty($translations[$locale]['title']) ? $translations[$locale]['title'] : $category->getTitle();
+
+                $finalArrayOfCategories[] = [
+                    'id' => $category->getID(),
+                    'slug' => $category->getSlug(),
+                    'title' => $translatedTitle,
+                    'projects_count' => count($category->getProjects()),
+                ];
+            }
         }
 
         // Return project's data

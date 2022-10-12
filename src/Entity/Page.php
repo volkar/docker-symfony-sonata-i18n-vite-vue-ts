@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Repository\PageRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Translatable\Translatable;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,20 +11,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 class Page implements Translatable
 {
+
+    #[Gedmo\Locale]
+    private $locale;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    private $slug;
 
     #[Gedmo\Translatable]
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
     private $title;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank]
-    private $slug;
-
+    #[Gedmo\Translatable]
     #[ORM\Column(type: 'text')]
     private $content;
 
@@ -71,17 +75,14 @@ class Page implements Translatable
         return $this;
     }
 
-    #[Gedmo\Locale]
-    private $locale;
+    public function setTranslatableLocale($locale)
+    {
+        $this->locale = $locale;
+    }
 
     public function __toString()
     {
         return ($this->getTitle()) ? : '';
-    }
-
-    public function setTranslatableLocale($locale)
-    {
-        $this->locale = $locale;
     }
 
 }
