@@ -94,7 +94,7 @@ npm run dev
 ```
 11. Open `http://localhost` in your browser.
 
-Administrator account created by fixtures (for EasyAdmin access):
+Administrator account created by fixtures (for SonataAdmin access):
 - login: **admin@admin.com**
 - pass: **admin**
 
