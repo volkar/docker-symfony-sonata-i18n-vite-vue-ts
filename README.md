@@ -47,7 +47,7 @@ Docker and Docker Compose can be installed with [Docker Desktop](https://www.doc
 1. Clone the project:
 
 ```
-git clone https://github.com/volkar/docker-symfony-vite-vue-ts.git
+git clone https://github.com/volkar/docker-symfony-sonata-i18n-vite-vue-ts.git
 ```
 
 2. Go to the project's folder
